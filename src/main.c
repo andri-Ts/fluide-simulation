@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 
 #include "../include/config.h"
-#include "../include/liquide.h"
+#include "fluide.h"
 
 int main(int argc, char* argv[])
 {
@@ -61,6 +61,8 @@ int main(int argc, char* argv[])
     SDL_SetRenderDrawColor(renderer, 0, 180, 216, SDL_ALPHA_OPAQUE);
     SDL_Rect rectangle_blue = {150, 50, 100, 50};
     SDL_RenderFillRect(renderer, &rectangle_blue);
+
+    draw_grid(renderer);
 
     // OPTIONS AFFICHAGES
     SDL_RenderPresent(renderer); // "affiche" tout ce qu'on a dessiné
