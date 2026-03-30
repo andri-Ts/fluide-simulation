@@ -1,0 +1,25 @@
+# Fichiers compilés
+*.o
+*.obj
+
+# Executables
+*.exe
+programme
+
+# Dossiers de build (si tu en ajoutes plus tard)
+build/
+bin/
+
+# Fichiers temporaires
+*.log
+*.tmp
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE / éditeurs
+.vscode/
+*.code-workspace
