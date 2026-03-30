@@ -52,9 +52,9 @@ int main(int argc, char* argv[])
     SDL_RenderClear(renderer);
 
     // Rectangle blanc
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);    // 1- DEFINIR LA COULEUR
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  // 1- DEFINIR LA COULEUR
     SDL_Rect rectangle = {50, 50, 100, 50};                             // 2- DEFINIR LE RECTANGLE
-    SDL_RenderFillRect(renderer, &rectangle);          // 3- DESSINER LE RECTANGLE
+    SDL_RenderFillRect(renderer, &rectangle);                           // 3- DESSINER LE RECTANGLE
 
     // Rectangle bleu ciel
     SDL_SetRenderDrawColor(renderer, 0, 180, 216, SDL_ALPHA_OPAQUE);
