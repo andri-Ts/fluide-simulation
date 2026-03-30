@@ -1,9 +1,20 @@
-# Variables
+# Compilateur
 CC = gcc
-CFLAGS = -Wall -I include
-LDFLAGS = -L lib -lmingw32 -lSDL2main -lSDL2 -mwindows
-SRC =
 
-# Création de l'excécutable
-liquide: src/main.c
-	$(CC) $(CFLAGS) src/main.c -o liquide $(LDFLAGS)
+# Options de compilation (warnings + include)
+CFLAGS = -Wall -I include
+
+# Options de linkage (bibliothèques SDL)
+LDFLAGS = -L lib -lmingw32 -lSDL2main -lSDL2 -mwindows
+
+# Sources et cible
+SRC = $(wildcard src/*.c)
+TARGET = liquide
+
+# Règle principale : créer l'exécutable
+$(TARGET):
+	$(CC) $(SRC) $(CFLAGS) -o $(TARGET) $(LDFLAGS)
+
+# Nettoyer
+clean:
+	del /Q $(TARGET)
