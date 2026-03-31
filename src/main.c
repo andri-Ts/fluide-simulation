@@ -5,6 +5,8 @@
 #include "config.h"
 #include "render.h"
 
+int grid[ROWS][COLUMNS] = {0};
+
 int main(int argc, char* argv[])
 {
     // --------------------------------------------------------
@@ -53,7 +55,6 @@ int main(int argc, char* argv[])
 
     while(program_running)
     {
-        draw_grid(renderer);
         // ---- HANDLE EVENT ----
         while(SDL_PollEvent(&event)) // Boucle qui vide la file d'événements
         {
@@ -66,7 +67,9 @@ int main(int argc, char* argv[])
                 case SDL_MOUSEMOTION:
                     int cellX = event.motion.x / CELL_SIZE;  // si souris à 120px, posX_cellule = posX_souris / size_cell (120px / 12px) = 10e colonne (index de la cellule)
                     int cellY = event.motion.y / CELL_SIZE; // index (ligne) de la cellule (ex: 5e ligne)
-                    color_cell(renderer, cellX, cellY);
+
+                    if(cellX >= 0 && cellX < COLUMNS && cellY >= 0 && cellY < ROWS) // sécurité
+                        grid[cellY][cellX] = 1;
                     break;
 
                 default:
@@ -76,21 +79,13 @@ int main(int argc, char* argv[])
 
         // ---- UPDATE ---- Logique du programme
 
+
         // ---- RENDER ----
-        // SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // fond noir
-        // SDL_RenderClear(renderer); // // Effacer l'écran avec le couleur noir
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer); // efface TOUT
 
-        // Rectangle blanc
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  // 1- DEFINIR LA COULEUR
-        SDL_Rect rectangle = {50, 50, 100, 50};                             // 2- DEFINIR LE RECTANGLE
-        SDL_RenderFillRect(renderer, &rectangle);                           // 3- DESSINER LE RECTANGLE
-
-        // Rectangle bleu ciel
-        SDL_SetRenderDrawColor(renderer, 0, 180, 216, SDL_ALPHA_OPAQUE);
-        SDL_Rect rectangle_blue = {150, 50, 100, 50};
-        SDL_RenderFillRect(renderer, &rectangle_blue);
-
-        // draw_grid(renderer);
+        draw_cell(renderer, grid);
+        draw_grid(renderer, grid);
 
         // OPTIONS AFFICHAGES
         SDL_RenderPresent(renderer); // "affiche" tout ce qu'on a dessiné
