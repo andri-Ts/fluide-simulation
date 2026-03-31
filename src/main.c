@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 
-#include "../include/config.h"
-#include "fluide.h"
+#include "config.h"
+#include "render.h"
 
 int main(int argc, char* argv[])
 {
@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
     SDL_Renderer *renderer = NULL; // Pointeur vers le renderer
 
     // --------------------------------------------------------
-    // Initialisations
+    // INITIALISATION
     // --------------------------------------------------------
 
     // Initialisation de SDL (système vidéo ici)
@@ -46,27 +46,51 @@ int main(int argc, char* argv[])
     }
 
     // --------------------------------------------------------
-    // CODES
+    // BOUCLE PRINCIPALE
     // --------------------------------------------------------
+    SDL_bool program_running = SDL_TRUE;
+    SDL_Event event; // capte tous les event
 
-    // Nettoyage de l'écran
-    SDL_RenderClear(renderer);
+    while(program_running)
+    {
+        // ---- HANDLE EVENT ----
+        while(SDL_PollEvent(&event)) // Boucle qui vide la file d'événements
+        {
+            switch(event.type) // Switch pour traiter chaque type d'evenements
+            {
+                case SDL_QUIT:
+                    program_running = SDL_FALSE; // pour fermer le programme
+                    break;
 
-    // Rectangle blanc
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  // 1- DEFINIR LA COULEUR
-    SDL_Rect rectangle = {50, 50, 100, 50};                             // 2- DEFINIR LE RECTANGLE
-    SDL_RenderFillRect(renderer, &rectangle);                           // 3- DESSINER LE RECTANGLE
+                default:
+                    break;
+            }
+        }
 
-    // Rectangle bleu ciel
-    SDL_SetRenderDrawColor(renderer, 0, 180, 216, SDL_ALPHA_OPAQUE);
-    SDL_Rect rectangle_blue = {150, 50, 100, 50};
-    SDL_RenderFillRect(renderer, &rectangle_blue);
+        // ---- UPDATE ---- Logique du programme
 
-    draw_grid(renderer);
+        // ---- RENDER ----
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // fond noir
+        SDL_RenderClear(renderer); // // Effacer l'écran avec le couleur noir
 
-    // OPTIONS AFFICHAGES
-    SDL_RenderPresent(renderer); // "affiche" tout ce qu'on a dessiné
-    SDL_Delay(5000);
+        // Rectangle blanc
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  // 1- DEFINIR LA COULEUR
+        SDL_Rect rectangle = {50, 50, 100, 50};                             // 2- DEFINIR LE RECTANGLE
+        SDL_RenderFillRect(renderer, &rectangle);                           // 3- DESSINER LE RECTANGLE
+
+        // Rectangle bleu ciel
+        SDL_SetRenderDrawColor(renderer, 0, 180, 216, SDL_ALPHA_OPAQUE);
+        SDL_Rect rectangle_blue = {150, 50, 100, 50};
+        SDL_RenderFillRect(renderer, &rectangle_blue);
+
+        draw_grid(renderer);
+
+        // OPTIONS AFFICHAGES
+        SDL_RenderPresent(renderer); // "affiche" tout ce qu'on a dessiné
+        SDL_Delay(16);
+    }
+
+
 
 // --------------------------------------------------------
 // Label pour le nettoyage
@@ -78,3 +102,16 @@ cleanup:
 
     return 0;
 }
+
+
+/* STRUCTURE :
+----------------
+init();
+while (running)
+{
+    handle_events();
+    update();
+    render();
+}
+cleanup();
+*/
