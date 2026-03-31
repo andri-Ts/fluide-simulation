@@ -9,4 +9,7 @@
 #define ROWS (SCREEN_HEIGHT / CELL_SIZE)
 #define LINE_WIDTH 2 //
 
+#define WATER_TYPE 0
+#define SOLID_TYPE 1
+
 #endif

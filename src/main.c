@@ -4,8 +4,9 @@
 
 #include "config.h"
 #include "render.h"
+#include "fluide.h"
 
-int grid[ROWS][COLUMNS] = {0};
+// Cell grid[ROWS][COLUMNS];
 
 int main(int argc, char* argv[])
 {
@@ -52,6 +53,7 @@ int main(int argc, char* argv[])
     // --------------------------------------------------------
     SDL_bool program_running = SDL_TRUE;
     SDL_Event event; // capte tous les event
+    // int cuurent_type = 0;
 
     while(program_running)
     {
@@ -65,12 +67,20 @@ int main(int argc, char* argv[])
                     break;
 
                 case SDL_MOUSEMOTION:
-                    int cellX = event.motion.x / CELL_SIZE;  // si souris à 120px, posX_cellule = posX_souris / size_cell (120px / 12px) = 10e colonne (index de la cellule)
-                    int cellY = event.motion.y / CELL_SIZE; // index (ligne) de la cellule (ex: 5e ligne)
+                    if(event.motion.state != 0) // Vérifie si **au moins un bouton de la souris est enfoncé** | // event.motion.state est un bitmask des boutons pressés
+                    {
+                        int cellX = event.motion.x / CELL_SIZE;  // si souris à 120px, posX_cellule = posX_souris / size_cell (120px / 12px) = 10e colonne (index de la cellule)
+                        int cellY = event.motion.y / CELL_SIZE; // index (ligne) de la cellule (ex: 5e ligne)
 
-                    if(cellX >= 0 && cellX < COLUMNS && cellY >= 0 && cellY < ROWS) // sécurité
-                        grid[cellY][cellX] = 1;
+                        if(cellX >= 0 && cellX < COLUMNS && cellY >= 0 && cellY < ROWS) // sécurité
+                            grid[cellY][cellX].type = SOLID_TYPE;
+                    }
                     break;
+
+                // case SDL_KEYDOWN:
+                //     if(event.key.keysym.sym == SDLK_SPACE)
+                //     break;
+
 
                 default:
                     break;
@@ -84,8 +94,8 @@ int main(int argc, char* argv[])
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer); // efface TOUT
 
-        draw_cell(renderer, grid);
-        draw_grid(renderer, grid);
+        // draw_cell(renderer, grid);
+        draw_grid(renderer);
 
         // OPTIONS AFFICHAGES
         SDL_RenderPresent(renderer); // "affiche" tout ce qu'on a dessiné
