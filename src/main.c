@@ -4,6 +4,9 @@
 
 #include "config.h"
 #include "render.h"
+#include "fluide.h"
+
+// Cell grid[ROWS][COLUMNS];
 
 int main(int argc, char* argv[])
 {
@@ -50,6 +53,7 @@ int main(int argc, char* argv[])
     // --------------------------------------------------------
     SDL_bool program_running = SDL_TRUE;
     SDL_Event event; // capte tous les event
+    init_grid();
 
     while(program_running)
     {
@@ -62,6 +66,21 @@ int main(int argc, char* argv[])
                     program_running = SDL_FALSE; // pour fermer le programme
                     break;
 
+                case SDL_MOUSEMOTION:
+                    int cellX = event.motion.x / CELL_SIZE;  // si souris à 120px, posX_cellule = posX_souris / size_cell (120px / 12px) = 10e colonne (index de la cellule)
+                    int cellY = event.motion.y / CELL_SIZE; // index (ligne) de la cellule (ex: 5e ligne)
+
+                    if(cellX >= 0 && cellX < COLUMNS && cellY >= 0 && cellY < ROWS) // sécurité
+                    {
+                        // click gauche -> solide (blanc)
+                        if(event.motion.state & SDL_BUTTON(SDL_BUTTON_LEFT)) // “Est-ce que le bit du bouton gauche est actif ?”
+                            grid[cellY][cellX].type = SOLID_TYPE;
+                        // click droite -> eau (bleu)
+                        else if(event.motion.state & SDL_BUTTON(SDL_BUTTON_RIGHT))
+                            grid[cellY][cellX].type = WATER_TYPE;
+                    }
+                    break;
+
                 default:
                     break;
             }
@@ -69,20 +88,12 @@ int main(int argc, char* argv[])
 
         // ---- UPDATE ---- Logique du programme
 
+
         // ---- RENDER ----
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // fond noir
-        SDL_RenderClear(renderer); // // Effacer l'écran avec le couleur noir
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer); // efface TOUT
 
-        // Rectangle blanc
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  // 1- DEFINIR LA COULEUR
-        SDL_Rect rectangle = {50, 50, 100, 50};                             // 2- DEFINIR LE RECTANGLE
-        SDL_RenderFillRect(renderer, &rectangle);                           // 3- DESSINER LE RECTANGLE
-
-        // Rectangle bleu ciel
-        SDL_SetRenderDrawColor(renderer, 0, 180, 216, SDL_ALPHA_OPAQUE);
-        SDL_Rect rectangle_blue = {150, 50, 100, 50};
-        SDL_RenderFillRect(renderer, &rectangle_blue);
-
+        draw_cell(renderer);
         draw_grid(renderer);
 
         // OPTIONS AFFICHAGES
