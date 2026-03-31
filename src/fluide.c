@@ -5,7 +5,7 @@
 
 void draw_grid(SDL_Renderer *renderer)
 {
-    // Je créer chauqe colonne (donc horizontale)
+    // Je créer chaque colonne (donc verticale)
     for(int i = 0; i < COLUMNS; i++)
     {
         SDL_Rect column = {
@@ -14,7 +14,7 @@ void draw_grid(SDL_Renderer *renderer)
             LINE_WIDTH,     // largeur de chaque colonne (épaisseur d'un carré)
             SCREEN_HEIGHT     // hauteur de la colonne.
         };
-        SDL_SetRenderDrawColor(renderer, 73, 80, 87, SDL_ALPHA_OPAQUE);
+        SDL_SetRenderDrawColor(renderer, 52, 58, 64, SDL_ALPHA_OPAQUE);
         SDL_RenderFillRect(renderer, &column);
     }
 
@@ -27,7 +27,7 @@ void draw_grid(SDL_Renderer *renderer)
             SCREEN_WIDTH,
             LINE_WIDTH
         };
-        SDL_SetRenderDrawColor(renderer, 73, 80, 87, SDL_ALPHA_OPAQUE);
+        SDL_SetRenderDrawColor(renderer, 52, 58, 64, SDL_ALPHA_OPAQUE);
         SDL_RenderFillRect(renderer, &row);
     }
 }

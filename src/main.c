@@ -50,6 +50,7 @@ int main(int argc, char* argv[])
     // --------------------------------------------------------
 
     // Nettoyage de l'écran
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
     // Rectangle blanc
@@ -78,3 +79,16 @@ cleanup:
 
     return 0;
 }
+
+
+/* STRUCTURE :
+----------------
+init();
+while (running)
+{
+    handle_events();
+    update();
+    render();
+}
+cleanup();
+*/
