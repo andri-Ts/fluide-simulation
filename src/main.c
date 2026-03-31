@@ -54,6 +54,7 @@ int main(int argc, char* argv[])
     SDL_bool program_running = SDL_TRUE;
     SDL_Event event; // capte tous les event
     // int cuurent_type = 0;
+    init_grid();
 
     while(program_running)
     {
@@ -94,7 +95,7 @@ int main(int argc, char* argv[])
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer); // efface TOUT
 
-        // draw_cell(renderer, grid);
+        draw_cell(renderer);
         draw_grid(renderer);
 
         // OPTIONS AFFICHAGES
