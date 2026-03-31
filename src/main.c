@@ -53,6 +53,7 @@ int main(int argc, char* argv[])
 
     while(program_running)
     {
+        draw_grid(renderer);
         // ---- HANDLE EVENT ----
         while(SDL_PollEvent(&event)) // Boucle qui vide la file d'événements
         {
@@ -60,6 +61,12 @@ int main(int argc, char* argv[])
             {
                 case SDL_QUIT:
                     program_running = SDL_FALSE; // pour fermer le programme
+                    break;
+
+                case SDL_MOUSEMOTION:
+                    int cellX = event.motion.x / CELL_SIZE;  // si souris à 120px, posX_cellule = posX_souris / size_cell (120px / 12px) = 10e colonne (index de la cellule)
+                    int cellY = event.motion.y / CELL_SIZE; // index (ligne) de la cellule (ex: 5e ligne)
+                    color_cell(renderer, cellX, cellY);
                     break;
 
                 default:
@@ -70,8 +77,8 @@ int main(int argc, char* argv[])
         // ---- UPDATE ---- Logique du programme
 
         // ---- RENDER ----
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // fond noir
-        SDL_RenderClear(renderer); // // Effacer l'écran avec le couleur noir
+        // SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // fond noir
+        // SDL_RenderClear(renderer); // // Effacer l'écran avec le couleur noir
 
         // Rectangle blanc
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);  // 1- DEFINIR LA COULEUR
@@ -83,7 +90,7 @@ int main(int argc, char* argv[])
         SDL_Rect rectangle_blue = {150, 50, 100, 50};
         SDL_RenderFillRect(renderer, &rectangle_blue);
 
-        draw_grid(renderer);
+        // draw_grid(renderer);
 
         // OPTIONS AFFICHAGES
         SDL_RenderPresent(renderer); // "affiche" tout ce qu'on a dessiné

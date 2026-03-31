@@ -21,3 +21,16 @@ void draw_grid(SDL_Renderer *renderer)
         }
     }
 }
+
+void color_cell(SDL_Renderer *renderer, int cellX, int cellY)
+{
+    // Caractéristiques du rectangle
+    SDL_Rect cell_colored = {
+        cellX * CELL_SIZE, // coordoné x du pixel: coordX de la cellule * taille d'une cellule
+        cellY * CELL_SIZE, // coordonné Y du nouveau rect
+        CELL_SIZE,
+        CELL_SIZE
+    };
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE); // determiner la courleur: en blanc
+    SDL_RenderFillRect(renderer, &cell_colored); // dessiner le rectangle
+}
