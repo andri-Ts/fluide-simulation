@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 
-#include "../include/config.h"
-#include "fluide.h"
+#include "config.h"
+#include "render.h"
 
 int main(int argc, char* argv[])
 {
@@ -49,8 +49,8 @@ int main(int argc, char* argv[])
     // CODES
     // --------------------------------------------------------
 
-    // Nettoyage de l'écran
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    // Effacer l'écran
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // fond noir
     SDL_RenderClear(renderer);
 
     // Rectangle blanc
