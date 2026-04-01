@@ -6,7 +6,7 @@
 typedef struct Cell
 {
     int type;
-    int fill_level;
+    double fill_level;
     int x;
     int y;
 } Cell;

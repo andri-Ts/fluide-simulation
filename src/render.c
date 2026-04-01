@@ -3,27 +3,11 @@
 #include "../include/render.h"
 #include "../include/fluide.h"
 
-void init_grid(void)
-{
-    for(int y = 0; y < ROWS; y++)
-    {
-        for(int x = 0; x < COLUMNS; x++)
-        {
-            grid[y][x].x = x;
-            grid[y][x].y = y;
-            grid[y][x].type = EMPTY_TYPE;
-            grid[y][x].fill_level = 0;
-        }
-    }
-}
-
-// ----------------------------------------------------------------------------------------
-
 void draw_grid(SDL_Renderer *renderer)
 {
     // on "dessine" tous les cellules
     // 1- DEFINIR LA COULEUR
-    SDL_SetRenderDrawColor(renderer, 52, 58, 64, SDL_ALPHA_OPAQUE);
+    SDL_SetRenderDrawColor(renderer, 52, 58, 64, SDL_ALPHA_OPAQUE); // vide : gris
     for(int y = 0; y < ROWS; y++)
     {
         for(int x = 0; x < COLUMNS; x++)
@@ -33,9 +17,9 @@ void draw_grid(SDL_Renderer *renderer)
 
             // 2- DEFINIR LE RECTANGLE
             SDL_Rect cell = {
-                x * CELL_SIZE,
+                x * CELL_SIZE, // posX = le num du pixel en X * taille d'une cellule en pix (12px)
                 y * CELL_SIZE,
-                CELL_SIZE,
+                CELL_SIZE, // longeur d'une cellule c'est 12px, donc posX du proche cellule: 12px * index
                 CELL_SIZE
             };
             // 3- DESSINER LE RECTANGLE
@@ -57,18 +41,33 @@ void draw_cell(SDL_Renderer *renderer)
                 continue; // cellule vide, on ne dessine rien
 
             if(grid[y][x].type == SOLID_TYPE)
+            {
                 SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE); // determiner la couleur (blanc)
+                SDL_Rect cell = {
+                    grid[y][x].x * CELL_SIZE,
+                    grid[y][x].y * CELL_SIZE -  (1  + grid[y][x].fill_level),
+                    CELL_SIZE,
+                    CELL_SIZE * grid[y][x].fill_level
+                };
+                SDL_RenderFillRect(renderer, &cell);
+            }
             else if(grid[y][x].type == WATER_TYPE)
+            {
                 SDL_SetRenderDrawColor(renderer, 0, 180, 216, SDL_ALPHA_OPAQUE); // eau bleu
 
-            SDL_Rect cell = {
-                grid[y][x].x * CELL_SIZE,
-                grid[y][x].y * CELL_SIZE,
-                CELL_SIZE,
-                CELL_SIZE
-            };
+                // L'eau doit oller au bas de la cellule
+                int height_water = CELL_SIZE * grid[y][x].fill_level; // si level = 1, taille de l'eau 12px, si level 0.75, taille de l'eau : 12 * 0.75
+                int posY_water = grid[y][x].y * CELL_SIZE + (CELL_SIZE - height_water); // y = top of cell + (cellsize - height of water)
 
-            SDL_RenderFillRect(renderer, &cell);
+                SDL_Rect cell = {
+                    grid[y][x].x * CELL_SIZE,
+                    posY_water,
+                    CELL_SIZE,
+                    height_water
+                };
+
+                SDL_RenderFillRect(renderer, &cell);
+            }
         }
     }
 }

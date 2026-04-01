@@ -74,10 +74,15 @@ int main(int argc, char* argv[])
                     {
                         // click gauche -> solide (blanc)
                         if(event.motion.state & SDL_BUTTON(SDL_BUTTON_LEFT)) // “Est-ce que le bit du bouton gauche est actif ?”
+                        {
                             grid[cellY][cellX].type = SOLID_TYPE;
+                        }
                         // click droite -> eau (bleu)
                         else if(event.motion.state & SDL_BUTTON(SDL_BUTTON_RIGHT))
+                        {
                             grid[cellY][cellX].type = WATER_TYPE;
+                            grid[cellY][cellX].fill_level = 0.75;
+                        }
                     }
                     break;
 
