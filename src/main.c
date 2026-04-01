@@ -51,9 +51,11 @@ int main(int argc, char* argv[])
     // --------------------------------------------------------
     // BOUCLE PRINCIPALE
     // --------------------------------------------------------
+
+    init_grid();
     SDL_bool program_running = SDL_TRUE;
     SDL_Event event; // capte tous les event
-    init_grid();
+    SDL_bool delete_mode = SDL_FALSE;
 
     while(program_running)
     {
@@ -66,12 +68,22 @@ int main(int argc, char* argv[])
                     program_running = SDL_FALSE; // pour fermer le programme
                     break;
 
+                case SDL_KEYDOWN:
+                    if(event.key.keysym.sym == SDLK_SPACE)
+                        delete_mode = !delete_mode;
+                    break;
+
                 case SDL_MOUSEMOTION:
                     int cellX = event.motion.x / CELL_SIZE;  // si souris à 120px, posX_cellule = posX_souris / size_cell (120px / 12px) = 10e colonne (index de la cellule)
                     int cellY = event.motion.y / CELL_SIZE; // index (ligne) de la cellule (ex: 5e ligne)
 
                     if(cellX >= 0 && cellX < COLUMNS && cellY >= 0 && cellY < ROWS) // sécurité
                     {
+                        if(delete_mode)
+                        {
+                            grid[cellY][cellX].type = EMPTY_TYPE;
+                            grid[cellY][cellX].fill_level = 0;
+                        }
                         // click gauche -> solide (blanc)
                         if(event.motion.state & SDL_BUTTON(SDL_BUTTON_LEFT)) // “Est-ce que le bit du bouton gauche est actif ?”
                         {
