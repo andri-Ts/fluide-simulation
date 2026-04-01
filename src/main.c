@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
                         else if(event.motion.state & SDL_BUTTON(SDL_BUTTON_RIGHT))
                         {
                             grid[cellY][cellX].type = WATER_TYPE;
-                            grid[cellY][cellX].fill_level = 0.75;
+                            grid[cellY][cellX].fill_level = 1.0f;
                         }
                     }
                     break;
@@ -110,6 +110,7 @@ int main(int argc, char* argv[])
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer); // efface TOUT
 
+        update_grid();
         draw_cell(renderer);
         draw_grid(renderer);
 

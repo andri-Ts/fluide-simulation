@@ -13,4 +13,6 @@ typedef struct Cell
 
 extern Cell grid[ROWS][COLUMNS]; // extern: déclaration → juste dire que la variable existe
 
+void simulation_step(void);
+
 #endif
