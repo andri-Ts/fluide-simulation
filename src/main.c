@@ -104,13 +104,12 @@ int main(int argc, char* argv[])
         }
 
         // ---- UPDATE ---- Logique du programme
-
+        simulation_step();
 
         // ---- RENDER ----
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer); // efface TOUT
 
-        update_grid();
         draw_cell(renderer);
         draw_grid(renderer);
 
