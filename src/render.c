@@ -3,6 +3,21 @@
 #include "../include/render.h"
 #include "../include/fluide.h"
 
+void render_frame(SDL_Renderer *renderer)
+{
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer); // efface TOUT
+
+    draw_cell(renderer);
+    draw_grid(renderer);
+
+    // OPTIONS AFFICHAGES
+    SDL_RenderPresent(renderer); // "affiche" tout ce qu'on a dessiné
+    SDL_Delay(16);
+}
+
+// ----------------------------------------------------------------------------------------
+
 void draw_grid(SDL_Renderer *renderer)
 {
     // on "dessine" tous les cellules

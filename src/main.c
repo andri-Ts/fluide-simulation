@@ -78,15 +78,10 @@ int main(int argc, char* argv[])
         simulation_step();
 
         // ---- RENDER ----
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer); // efface TOUT
+        render_frame(renderer);
 
-        draw_cell(renderer);
-        draw_grid(renderer);
 
-        // OPTIONS AFFICHAGES
-        SDL_RenderPresent(renderer); // "affiche" tout ce qu'on a dessiné
-        SDL_Delay(16);
+
     }
 
     cleanup();
