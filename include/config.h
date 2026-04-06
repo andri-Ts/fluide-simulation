@@ -13,4 +13,18 @@
 #define WATER_TYPE 0
 #define SOLID_TYPE 1
 
+typedef enum
+{
+    EMPTY_TYPE,
+    WATER_TYPE?
+    SOLID_TYPE
+} CellType;
+
+typedef struct Cell
+{
+    int type; // Celltype cell
+    double fill_level; // 0 à 1
+    int x, y;
+} Cell;
+
 #endif
