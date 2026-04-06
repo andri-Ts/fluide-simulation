@@ -5,10 +5,10 @@
 #include "config.h"
 #include "render.h"
 #include "fluide.h"
+#include "input.h"
 
-// Cell grid[ROWS][COLUMNS];
 
-// Variables globales SDL
+// Variables globales SDL | static: visible uniquement dans ce fichier
 static SDL_Window *window = NULL; // Pointeur vers la fenêtre SDL
 static SDL_Renderer *renderer = NULL; // Pointeur vers le renderer
 
@@ -31,48 +31,7 @@ int main(int argc, char* argv[])
     while(program_running)
     {
         // ---- HANDLE EVENT ----
-        while(SDL_PollEvent(&event)) // Boucle qui vide la file d'événements
-        {
-            switch(event.type) // Switch pour traiter chaque type d'evenements
-            {
-                case SDL_QUIT:
-                    program_running = SDL_FALSE; // pour fermer le programme
-                    break;
-
-                case SDL_KEYDOWN:
-                    if(event.key.keysym.sym == SDLK_SPACE)
-                        delete_mode = !delete_mode;
-                    break;
-
-                case SDL_MOUSEMOTION:
-                    int cellX = event.motion.x / CELL_SIZE;  // si souris à 120px, posX_cellule = posX_souris / size_cell (120px / 12px) = 10e colonne (index de la cellule)
-                    int cellY = event.motion.y / CELL_SIZE; // index (ligne) de la cellule (ex: 5e ligne)
-
-                    if(cellX >= 0 && cellX < COLUMNS && cellY >= 0 && cellY < ROWS) // sécurité
-                    {
-                        if(delete_mode)
-                        {
-                            grid[cellY][cellX].type = EMPTY_TYPE;
-                            grid[cellY][cellX].fill_level = 0;
-                        }
-                        // click gauche -> solide (blanc)
-                        if(event.motion.state & SDL_BUTTON(SDL_BUTTON_LEFT)) // “Est-ce que le bit du bouton gauche est actif ?”
-                        {
-                            grid[cellY][cellX].type = SOLID_TYPE;
-                        }
-                        // click droite -> eau (bleu)
-                        else if(event.motion.state & SDL_BUTTON(SDL_BUTTON_RIGHT))
-                        {
-                            grid[cellY][cellX].type = WATER_TYPE;
-                            grid[cellY][cellX].fill_level = 1.0f;
-                        }
-                    }
-                    break;
-
-                default:
-                    break;
-            }
-        }
+        handle_events(&event, &program_running, & delete_mode);
 
         // ---- UPDATE ---- Logique du programme
         simulation_step();
@@ -80,8 +39,7 @@ int main(int argc, char* argv[])
         // ---- RENDER ----
         render_frame(renderer);
 
-
-
+        SDL_Delay(16);
     }
 
     cleanup();
@@ -120,6 +78,7 @@ void init_sdl(void)
     {
         fprintf(stderr, "Erreur SDL_CreateRenderer : %s\n", SDL_GetError());
         cleanup();
+        exit(1);
 
     }
 }
@@ -128,8 +87,18 @@ void init_sdl(void)
 
 void cleanup(void)
 {
-    if (renderer) SDL_DestroyRenderer(renderer);
-    if (window) SDL_DestroyWindow(window);
+    if (renderer)
+    {
+        SDL_DestroyRenderer(renderer);
+        renderer == NULL;
+    }
+
+    if (window)
+    {
+        SDL_DestroyWindow(window);
+        window == NULL;
+    }
+
     SDL_Quit();
 }
 

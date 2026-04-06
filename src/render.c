@@ -13,7 +13,6 @@ void render_frame(SDL_Renderer *renderer)
 
     // OPTIONS AFFICHAGES
     SDL_RenderPresent(renderer); // "affiche" tout ce qu'on a dessiné
-    SDL_Delay(16);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -59,8 +58,8 @@ void draw_cell(SDL_Renderer *renderer)
             {
                 SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE); // determiner la couleur (blanc)
                 SDL_Rect cell = {
-                    grid[y][x].x * CELL_SIZE,
-                    grid[y][x].y * CELL_SIZE,
+                    x * CELL_SIZE,
+                    y * CELL_SIZE,
                     CELL_SIZE,
                     CELL_SIZE
                 };
