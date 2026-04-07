@@ -49,13 +49,13 @@ void cleanup(void)
     if (renderer)
     {
         SDL_DestroyRenderer(renderer);
-        renderer == NULL;
+        renderer = NULL;
     }
 
     if (window)
     {
         SDL_DestroyWindow(window);
-        window == NULL;
+        window = NULL;
     }
 
     SDL_Quit();

@@ -58,31 +58,28 @@ void render_frame(void)
 
 // // ----------------------------------------------------------------------------------------
 
-// void draw_grid(SDL_Renderer *renderer)
-// {
-//     // on "dessine" tous les cellules
-//     // 1- DEFINIR LA COULEUR
-//     SDL_SetRenderDrawColor(renderer, 52, 58, 64, SDL_ALPHA_OPAQUE); // vide : gris
-//     for(int y = 0; y < ROWS; y++)
-//     {
-//         for(int x = 0; x < COLUMNS; x++)
-//         {
-//              if(grid[y][x].type != EMPTY_TYPE)
-//                 continue; // pas de grille sur les cellules colorées
+void draw_grid(SDL_Renderer *renderer)
+{
+    // on "dessine" tous les cellules
+    // 1- DEFINIR LA COULEUR
+    SDL_SetRenderDrawColor(renderer, 40, 40, 40, SDL_ALPHA_OPAQUE); // gris discret
 
-//             // 2- DEFINIR LE RECTANGLE
-//             SDL_Rect cell = {
-//                 x * CELL_SIZE, // posX = le num du pixel en X * taille d'une cellule en pix (12px)
-//                 y * CELL_SIZE,
-//                 CELL_SIZE, // longeur d'une cellule c'est 12px, donc posX du proche cellule: 12px * index
-//                 CELL_SIZE
-//             };
-//             // 3- DESSINER LE RECTANGLE
-//             SDL_RenderDrawRect(renderer, &cell); // contour de chaque rectangle
+    // lignes verticales
+    for(int x = 0; x <= COLUMNS; x++)
+    {
+        // 2 - DEFINIR LA FIGURE
+        int posX = x * CELL_SIZE;
+        //// 3- DESSINER LA FIGURE (sur celle-ci, definition et dessin en même tmps)
+        SDL_RenderDrawLine(renderer, posX, 0, posX, ROWS * CELL_SIZE); // (xStart, yStart, xEnd, yeND[coordoné du dernier pixel du bas])
+    }
 
-//         }
-//     }
-// }
+    // ligne horizontales
+    for (int y = 0; y < ROWS; y++)
+    {
+        int posY = y * CELL_SIZE;
+        SDL_RenderDrawLine(renderer, 0, posY, COLUMNS * CELL_SIZE, posY);
+    }
+}
 
 // // ----------------------------------------------------------------------------------------
 

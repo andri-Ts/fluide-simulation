@@ -23,7 +23,7 @@ void handle_events(SDL_bool *running, SDL_bool *delete_mode)
                 int cellX = event.motion.x / CELL_SIZE;
                 int cellY = event.motion.y / CELL_SIZE;
 
-                if(cellX < 0 && cellX >= COLUMNS && cellY < 0 && cellY >= ROWS)
+                if(cellX < 0 || cellX >= COLUMNS || cellY < 0 || cellY >= ROWS)
                     break;
 
                 if(*delete_mode)
