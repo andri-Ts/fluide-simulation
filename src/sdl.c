@@ -1,6 +1,7 @@
-#include "sdl.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "sdl.h"
+#include "config.h"
 
 // Variables globales SDL | static: visible uniquement dans ce fichier
 static SDL_Window *window = NULL; // Pointeur vers la fenêtre SDL

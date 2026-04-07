@@ -4,7 +4,7 @@
 
 void handle_events(SDL_bool *running, SDL_bool *delete_mode)
 {
-    SDL_Event event;
+    SDL_Event event; // capte tous les event
 
     while(SDL_PollEvent(&event))
     {
@@ -30,7 +30,7 @@ void handle_events(SDL_bool *running, SDL_bool *delete_mode)
                     remove_cell(cellX, cellY);
                 else if(event.motion.state & SDL_BUTTON(SDL_BUTTON_LEFT))
                     add_solid(cellX, cellY);
-                else if(event->motion.state & SDL_BUTTON(SDL_BUTTON_RIGHT))
+                else if(event.motion.state & SDL_BUTTON(SDL_BUTTON_RIGHT))
                     add_water(cellX, cellY);
 
                 break;
