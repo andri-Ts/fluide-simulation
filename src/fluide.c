@@ -33,44 +33,60 @@ void init_grid(void)
 
 void simulation_step(void)
 {
-    for(int y = ROWS - 2; y >= 0; y--)
+    for(int y = ROWS - 2; y >= 0; y--) // -2 : car on regarde la cellule d'en dessous
     {
         for(int x = 0; x < COLUMNS; x++)
         {
-            switch(grid[y][x].type)
+            if(grid[y][x].type == WATER_TYPE) // je suis une cellule d'eau
             {
-                case EMPTY_TYPE:
-                    break;
-
-                case WATER_TYPE: // je suis une cellule d'eau
-                    if(grid[y+1][x].type == EMPTY_TYPE) // si la cellule de dessous est vide
-                    {
-                        grid[y+1][x].type = WATER_TYPE; // elle reçoit mon eau
-                        grid[y+1][x].fill_level = grid[y][x].fill_level; // avec la meme quantité
-
-                        grid[y][x].type = EMPTY_TYPE;  // moi je me vide
+                switch(grid[y+1][x].type)
+                {
+                    case EMPTY_TYPE: // si la cellule de dessous es vide, j'y met ma quantité d'eau et je me vide
+                        grid[y+1][x].type = WATER_TYPE;
+                        grid[y+1][x].fill_level = grid[y][x].fill_level;
+                        grid[y][x].type = EMPTY_TYPE;
                         grid[y][x].fill_level = 0.0f;
+                        break;
 
-                    }
-                    break;
-
-                default:
-                    break;
+                    default:
+                        break;
+                }
             }
+
+            // switch(grid[y][x].type)
+            // {
+            //     case EMPTY_TYPE:
+            //         break;
+
+            //     case WATER_TYPE: // je suis une cellule d'eau
+            //         if(grid[y+1][x].type == EMPTY_TYPE) // si la cellule de dessous est vide
+            //         {
+            //             grid[y+1][x].type = WATER_TYPE; // elle reçoit mon eau
+            //             grid[y+1][x].fill_level = grid[y][x].fill_level; // avec la meme quantité
+
+            //             grid[y][x].type = EMPTY_TYPE;  // moi je me vide
+            //             grid[y][x].fill_level = 0.0f;
+
+            //         }
+            //         break;
+
+            //     default:
+            //         break;
+            // }
         }
     }
 }
 
 // ----------------------------------------------------------------------------------------
 
-void add_water(int x, int y)
+void water_cell(int x, int y)
 {
     if(x < 0 || x >= COLUMNS || y < 0 || y >= ROWS) return;
     grid[y][x].type = WATER_TYPE;
     grid[y][x].fill_level = 1.0f;
 }
 
-void add_solid(int x, int y)
+void solid_cell(int x, int y)
 {
     if(x < 0 || x >= COLUMNS || y < 0 || y >= ROWS) return;
     grid[y][x].type = SOLID_TYPE;

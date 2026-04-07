@@ -22,7 +22,7 @@ typedef enum
 
 typedef struct Cell
 {
-    int type; // Celltype cell
+    CellType type; // Celltype cell
     double fill_level; // 0 à 1
     int x, y;
 } Cell;
