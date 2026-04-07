@@ -13,11 +13,6 @@ Cell get_cell(int y, int x)
     return grid[y][x];
 }
 
-// void set_cell(int y, int x, Cell c)
-// {
-//     grid[y][x] = c;
-// }
-
 // ----------------------------------------------------------------------------------------
 
 void init_grid(void)
