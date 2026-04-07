@@ -3,14 +3,16 @@
 
 #include "config.h"
 
-typedef struct Cell
-{
-    int type;
-    double fill_level;
-    int x;
-    int y;
-} Cell;
+void init_grid(void);
+void simulation_step(void);
 
-extern Cell grid[ROWS][COLUMNS]; // extern: déclaration → juste dire que la variable existe
+// Acces au grid via API
+Cell get_cell(int y, int x);
+// void set_cell(int y, int x, Cell c);
+
+//Foncitons pour manipueler les cellules
+void add_water(int x, int y);
+void add_solid(int x, int y);
+void remove_cell(int x, int y);
 
 #endif
