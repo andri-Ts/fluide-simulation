@@ -4,7 +4,7 @@
 #define SCREEN_WIDTH 900
 #define SCREEN_HEIGHT 600
 
-#define CELL_SIZE 70 // 15px
+#define CELL_SIZE 15 // 15px
 #define COLUMNS (SCREEN_WIDTH / CELL_SIZE) // nbr de colonne 900 / 15 = 60 col
 #define ROWS (SCREEN_HEIGHT / CELL_SIZE)
 #define LINE_WIDTH 2 //
