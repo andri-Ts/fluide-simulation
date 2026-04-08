@@ -58,7 +58,7 @@ void simulation_step(void)
             {
                 case EMPTY_TYPE:
                 {
-                    // L'eau tombe complètement
+                    // L'eau tombe complètement (REGLE 1)
                     c_below_cell->type = WATER_TYPE;
                     c_below_cell->fill_level = current_cell->fill_level;
 
@@ -68,7 +68,7 @@ void simulation_step(void)
                     break;
                 }
 
-                case WATER_TYPE:
+                case WATER_TYPE: // (REGLE 1)
                 {
                     float below_capacity = 1 - below_cell->fill_level; // quantité que peut recevoir la cellule du dessous
                     float current_quantity = current_cell->fill_level; // quantité d'eau que la cellule possède
