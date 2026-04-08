@@ -13,7 +13,7 @@ void render_frame(void)
     SDL_RenderClear(renderer);
 
     // Dessiner la grille
-    draw_grid(renderer);
+    // draw_grid(renderer);
 
     for(int y = 0; y < ROWS; y++)
     {
