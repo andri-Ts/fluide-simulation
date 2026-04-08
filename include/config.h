@@ -9,10 +9,6 @@
 #define ROWS (SCREEN_HEIGHT / CELL_SIZE)
 #define LINE_WIDTH 2 //
 
-// #define EMPTY_TYPE -1
-// #define WATER_TYPE 0
-// #define SOLID_TYPE 1
-
 typedef enum
 {
     EMPTY_TYPE,
@@ -22,7 +18,7 @@ typedef enum
 
 typedef struct Cell
 {
-    CellType type; // Celltype cell
+    CellType type;
     float fill_level; // 0 à 1
     int x, y;
 } Cell;
