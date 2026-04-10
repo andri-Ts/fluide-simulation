@@ -34,78 +34,162 @@ void init_grid(void)
 
 // ----------------------------------------------------------------------------------------
 
-void simulation_step(void)
-{
-    // 1.Copier l'état actuel du grid dans next_grid
-    memcpy(next_grid, grid, sizeof(grid));
+// void simulation_step(void)
+// {
+//     // 1.Créer un nouveau du grid dans next_grid
+//     memset(next_grid, 0, sizeof(grid));
 
-    // 2.On parcours l'écran de bas vers le haut (grid LECTURE uniquement)
-    for(int y = ROWS - 2; y >= 0; y--)
+//     // 2.On parcours l'écran de bas vers le haut (grid LECTURE uniquement)
+//     for(int y = ROWS - 2; y >= 0; y--)
+//     {
+//         for(int x = 0; x < COLUMNS; x++)
+//         {
+//             Cell *current_cell = &grid[y][x];
+
+
+//             // On écirit dans next_grid (copie de la grid)
+//             Cell *c_current_cell = &next_grid[y][x];
+//             Cell *c_below_cell = &next_grid[y+1][x];
+
+//             if(current_cell->type != WATER_TYPE)
+//                 continue;
+
+//             switch(below_cell->type)
+//             {
+//                 case EMPTY_TYPE:
+//                 {
+//                     // L'eau tombe complètement (REGLE 1)
+//                     c_below_cell->type = WATER_TYPE;
+//                     c_below_cell->fill_level = current_cell->fill_level;
+
+//                     c_current_cell->type = EMPTY_TYPE;
+//                     c_current_cell->fill_level = 0.0f;
+
+//                     break;
+//                 }
+
+//                 case WATER_TYPE: // (REGLE 1)
+//                 {
+//                     float below_capacity = 1 - below_cell->fill_level; // quantité que peut recevoir la cellule du dessous
+//                     float current_quantity = current_cell->fill_level; // quantité d'eau que la cellule possède
+//                     float transfer = 0.0f; // quantité réél d'eau a transféré vers le bas
+
+//                     // La quantité réel transmis vers le bas est le minimum entre ce que le bas peut recevoir et ce que le haut peut donner
+//                     if( below_capacity >= current_quantity)
+//                         transfer = current_quantity; // below possede assez de capacité pour contenir tout l'eau de current
+//                     else
+//                         transfer = below_capacity;
+
+//                     c_below_cell->fill_level += transfer;
+//                     c_current_cell->fill_level -= transfer;
+
+//                     // Nettoyage float (important) ET // remettre la cellule current comme vide si c'est le cas
+//                     if(c_current_cell->fill_level < 0.0001f)
+//                     {
+//                         c_current_cell->type = EMPTY_TYPE;
+//                         c_current_cell->fill_level = 0.0f;
+//                     }
+
+//                     if(c_below_cell->fill_level > 1.0f)
+//                         c_below_cell->fill_level = 1.0f;
+
+//                     break;
+//                 }
+
+//                 default:
+//                     break;
+//             }
+
+//         }
+//     }
+
+//     // 3.Appliquer le résultat au vrai grid
+//     memcpy(grid, next_grid, sizeof(grid));
+// }
+
+void simulation_step()
+{
+    //  =================================
+    // 1. RESET COMPLET DE next_grid
+    // ==================================
+    memset(next_grid, 0, sizeof(grid)); // (grid à afficher pour le prochain frame) on le veut vide
+
+    //  =================================
+    // 2. Parcours de la grille(lecture)
+    // ==================================
+    for( int y = ROWS - 1; y >= 0; y--) // On parcours l'écran de bas vers le haut (grid LECTURE uniquement)
     {
         for(int x = 0; x < COLUMNS; x++)
         {
-            Cell *current_cell = &grid[y][x];
-            Cell *below_cell = &grid[y+1][x];
+            Cell *current = &grid[y][x];
 
-            // On écirit dans next_grid (copie de la grid)
-            Cell *c_current_cell = &next_grid[y][x];
-            Cell *c_below_cell = &next_grid[y+1][x];
+            //  =================================
+            // 3. Ignorer certainnes conditions
+            // ==================================
 
-            if(current_cell->type != WATER_TYPE)
-                continue;
-
-            switch(below_cell->type)
+            // copie des cell solides
+            if(current->type == SOLID_TYPE)
             {
-                case EMPTY_TYPE:
-                {
-                    // L'eau tombe complètement (REGLE 1)
-                    c_below_cell->type = WATER_TYPE;
-                    c_below_cell->fill_level = current_cell->fill_level;
-
-                    c_current_cell->type = EMPTY_TYPE;
-                    c_current_cell->fill_level = 0.0f;
-
-                    break;
-                }
-
-                case WATER_TYPE: // (REGLE 1)
-                {
-                    float below_capacity = 1 - below_cell->fill_level; // quantité que peut recevoir la cellule du dessous
-                    float current_quantity = current_cell->fill_level; // quantité d'eau que la cellule possède
-                    float transfer = 0.0f; // quantité réél d'eau a transféré vers le bas
-
-                    // La quantité réel transmis vers le bas est le minimum entre ce que le bas peut recevoir et ce que le haut peut donner
-                    if( below_capacity >= current_quantity)
-                        transfer = current_quantity; // below possede assez de capacité pour contenir tout l'eau de current
-                    else
-                        transfer = below_capacity;
-
-                    c_below_cell->fill_level += transfer;
-                    c_current_cell->fill_level -= transfer;
-
-                    // Nettoyage float (important) ET // remettre la cellule current comme vide si c'est le cas
-                    if(c_current_cell->fill_level < 0.0001f)
-                    {
-                        c_current_cell->type = EMPTY_TYPE;
-                        c_current_cell->fill_level = 0.0f;
-                    }
-
-                    if(c_below_cell->fill_level > 1.0f)
-                        c_below_cell->fill_level = 1.0f;
-
-                    break;
-                }
-
-                default:
-                    break;
+                next_grid[y][x] = *current;
+                continue; // sort de la boucle for et saute à l'itération suivante
             }
 
+            // Ignorer les cellules vides
+            if(current->type != WATER_TYPE)
+                continue;
+
+            // Quantité d'eau dans la cellule courante
+            float current_quantity = current->fill_level;
+            Cell *next_current = &next_grid[y][x];
+
+            //  =================================
+            // 3. RULE 1: flow down (gravité)
+            // ==================================
+            if(y + 1 < ROWS) // sécurité pour ne pas sortir de la fenêtre window
+            {
+                Cell *below = &grid[y+1][x];
+
+                if(below->type != SOLID_TYPE)
+                {
+                    float below_capacity = 1.0f - below->fill_level;
+                    float transfer = current_quantity;
+
+                    if(transfer > below_capacity)
+                        transfer = below_capacity; // on ne transfert que ce que below peut contenir, si non on transfert tout
+
+                    // On modifie la cellule d'en bas
+                    if(transfer > 0.0f)
+                    {
+                        current_quantity -= transfer; // on soustrait la quentité d'eau transféré vers le bas à la cellule courante
+                        next_grid[y+1][x].fill_level += transfer;
+                        next_grid[y+1][x].type = WATER_TYPE;
+                    }
+                }
+            }
+
+            //  ====================================
+            // 3. Mettre à jour la cellule courante
+            // =====================================
+            next_current->fill_level += current_quantity; // a priori le next_grid level est à 0, donc on ajoute l'eau qui reste
+            if(next_current->fill_level > 0.001f)
+            {
+                next_current->type = WATER_TYPE;
+            }
+            else
+            {
+                next_current->type = EMPTY_TYPE;
+                next_current->fill_level = 0.0f;
+            }
         }
     }
 
-    // 3.Appliquer le résultat au vrai grid
+    //  ===================================
+    // FINAL: Remplacer grid par next_grid
+    // ====================================
     memcpy(grid, next_grid, sizeof(grid));
 }
+
+
 
 // ----------------------------------------------------------------------------------------
 
@@ -113,7 +197,7 @@ void water_cell(int x, int y)
 {
     if(x < 0 || x >= COLUMNS || y < 0 || y >= ROWS) return;
     grid[y][x].type = WATER_TYPE;
-    grid[y][x].fill_level = 0.5f;
+    grid[y][x].fill_level = 1.0f;
 }
 
 void solid_cell(int x, int y)
