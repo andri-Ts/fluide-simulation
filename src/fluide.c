@@ -143,7 +143,7 @@ void simulation_step()
             Cell *next_current = &next_grid[y][x];
 
             //  =================================
-            // 3. RULE 1: flow down (gravité)
+            // RULE 1: flow down (gravité)
             // ==================================
             if(y + 1 < ROWS) // sécurité pour ne pas sortir de la fenêtre window
             {
@@ -166,6 +166,41 @@ void simulation_step()
                     }
                 }
             }
+
+            //  =================================
+            // RULE 2: flow LEFT
+            // ==================================
+            if(x + 1 >= 0) // Sécurité pour ne pas faire débordé la grid
+            {
+                Cell *left = &grid[y][x-1];
+
+                if(left->type != SOLID_TYPE)
+                {
+                    float diff = current_quantity - left->fill_level; // différence de niveau d'eau
+
+                    if(diff > 0) // c-a-d cellule courante contient plus d'eau que cellule de gauche
+                    {
+                        float transfer = diff / 2.0f;
+                        float left_capacity = 1.0f - left->fill_level;
+
+                        // Limite max de transfert par frame
+                        // if(flow > 0.25f)
+                        //     flow = 0.25f; // valeur empirique
+
+                        if(transfer > left_capacity)
+                            transfer = left_capacity; // on ne transmet que ce que la cellule de gauche peut recevoir
+                        if(transfer > current_quantity)
+                            transfer = current_quantity; // emp^che de créer de l'eau, on ne transfert que la quantité possédée par current
+
+                        next_grid[y][x-1].fill_level += transfer;
+                        next_grid[y][x-1].type = WATER_TYPE;
+
+                        current_quantity -= transfer; // Calcul le reste
+
+                    }
+                }
+            }
+
 
             //  ====================================
             // 3. Mettre à jour la cellule courante
