@@ -184,8 +184,8 @@ void simulation_step()
                         float left_capacity = 1.0f - left->fill_level;
 
                         // Limite max de transfert par frame
-                        // if(flow > 0.25f)
-                        //     flow = 0.25f; // valeur empirique
+                        if(transfer > 0.25f)
+                            transfer = 0.25f; // valeur empirique
 
                         if(transfer > left_capacity)
                             transfer = left_capacity; // on ne transmet que ce que la cellule de gauche peut recevoir
@@ -201,6 +201,35 @@ void simulation_step()
                 }
             }
 
+            //  =================================
+            // RULE 2: flow RIGHT
+            // ==================================
+            if(x + 1 < COLUMNS)
+            {
+                Cell *right = &grid[y][x+1];
+
+                if(right->type != SOLID_TYPE)
+                {
+                    float diff = current_quantity - right->fill_level; // le reste de l'eau courant apres regle 1 et regle 2(left) - level right
+
+                    if(diff > 0.0f)
+                    {
+                        float transfer = diff * 0.5f;
+                        float right_capacity = 1 - right->fill_level;
+
+                        if(transfer > right_capacity)
+                            transfer = right_capacity;
+                        if(transfer > current_quantity)
+                            transfer = current_quantity;
+
+                        if(transfer > 0.25f)
+                            transfer = 0.25f;
+
+                        grid[y][x+1].fill_level += transfer;
+                        grid[y][x+1].type = WATER_TYPE;
+                    }
+                }
+            }
 
             //  ====================================
             // 3. Mettre à jour la cellule courante
