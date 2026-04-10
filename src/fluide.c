@@ -82,8 +82,8 @@ void simulation_step()
 
                 if(below->type != SOLID_TYPE)
                 {
-                    float capacity = 1.0f - next_grid[y+1][x].fill_level; // on utilise next_grid car plrs cellules peuvent déjà avoir ajouté de l'eau à cette case pendant cette frame
                     down_flow = current_quantity;
+                    float capacity = 1.0f - next_grid[y+1][x].fill_level; // on utilise next_grid car plrs cellules peuvent déjà avoir ajouté de l'eau à cette case pendant cette frame
 
                     if(down_flow > capacity)
                         down_flow = capacity; // évite le surcharge
@@ -123,7 +123,7 @@ void simulation_step()
             }
 
             // ==================================
-            // NORMALISATION
+            // NORMALISATION (réduit tout proportionnement)
             // ==================================
             float total_flow = down_flow + left_flow + right_flow;
 
@@ -138,7 +138,7 @@ void simulation_step()
             }
 
             // ==================================
-            // Application des flux
+            // Application des flux (envoye des quantités réels d'eau dans les cases voisines)
             // ==================================
             if(down_flow > 0.0f)
             {
@@ -161,7 +161,7 @@ void simulation_step()
             // ==================================
             // Reste dans la cellule actuelle
             // ==================================
-             float stay = current->fill_level - (down_flow + left_flow + right_flow);
+             float stay = current->fill_level - (down_flow + left_flow + right_flow); // l'eau qui n'a pas bougé
 
             if(stay > 0.001f)
             {
