@@ -65,11 +65,15 @@ void simulation_step()
             if(current->type != WATER_TYPE)
                 continue;
 
-            // Quantité d'eau dans la cellule courante
-            float current_quantity = current->fill_level;
-            Cell *next_current = &next_grid[y][x];
 
-            // =================================
+            // float current_quantity = current->fill_level;
+            // Cell *next_current = &next_grid[y][x];
+            float current_quantity = current->fill_level; // Quantité d'eau dans la cellule courante
+            float down_flow = 0.0f; // flux de descente
+            float left_flow = 0.0f; // flux de vers la gauche
+            float right_flow = 0.0f; //
+
+            // ==================================
             // RULE 1: flow down (gravité)
             // ==================================
             if(y + 1 < ROWS) // sécurité pour ne pas sortir de la fenêtre window
@@ -78,104 +82,98 @@ void simulation_step()
 
                 if(below->type != SOLID_TYPE)
                 {
-                    float below_capacity = 1.0f - below->fill_level;
-                    float space = 1.0f - next_grid[y+1][x].fill_level;
-                    float transfer = current_quantity;
+                    float capacity = 1.0f - next_grid[y+1][x].fill_level; // on utilise next_grid car plrs cellules peuvent déjà avoir ajouté de l'eau à cette case pendant cette frame
+                    down_flow = current_quantity;
 
-                    if(transfer > below_capacity)
-                        transfer = below_capacity; // on ne transfert que ce que below peut contenir, si non on transfert tout
-                    if(transfer > space)
-                        transfer = space; // évite le surcharge
+                    if(down_flow > capacity)
+                        down_flow = capacity; // évite le surcharge
 
-                    // On modifie la cellule d'en bas
-                    if(transfer > 0.0f)
-                    {
-                        current_quantity -= transfer; // on soustrait la quentité d'eau transféré vers le bas à la cellule courante
-                        next_grid[y+1][x].fill_level += transfer;
-                        next_grid[y+1][x].type = WATER_TYPE;
-                    }
+                    current_quantity -= down_flow;
                 }
             }
 
-            // =================================
-            // RULE 2: flow LEFT
             // ==================================
-            if(x - 1 >= 0) // Sécurité pour ne pas faire débordé la grid
-            {
-                Cell *left = &grid[y][x-1];
-
-                if(left->type != SOLID_TYPE)
-                {
-                    float diff = current_quantity - left->fill_level; // différence de niveau d'eau
-
-                    if(diff > 0) // c-a-d cellule courante contient plus d'eau que cellule de gauche
-                    {
-                        float transfer = diff * 0.5f;
-                        float left_capacity = 1.0f - left->fill_level;
-
-                        // Limite max de transfert par frame
-                        if(transfer > 0.25f)
-                            transfer = 0.25f; // valeur empirique
-
-                        if(transfer > left_capacity)
-                            transfer = left_capacity; // on ne transmet que ce que la cellule de gauche peut recevoir
-                        if(transfer > current_quantity)
-                            transfer = current_quantity; // emp^che de créer de l'eau, on ne transfert que la quantité possédée par current
-
-                        next_grid[y][x-1].fill_level += transfer;
-                        next_grid[y][x-1].type = WATER_TYPE;
-
-                        current_quantity -= transfer; // Calcul le reste
-
-                    }
-                }
-            }
-
-            //  =================================
-            // RULE 2: flow RIGHT
+            // RULE 2: Horizontal (gauche/droite)
             // ==================================
-            if(x + 1 < COLUMNS)
+
+            float left_quantity = (x > 0) ? grid[y][x-1].fill_level : 0.0f; // si voisin (actuelle) existe, on lit la valeur, sinon o suppose vide
+            float right_quantity = (x < COLUMNS - 1) ? grid[y][x+1].fill_level : 0.0f;
+
+            float left_diff = current_quantity - left_quantity; // current est il plus plein que son voisin
+            float right_diff = current_quantity - right_quantity;
+
+            // -------- LEFT --------------
+            if( x > 0 && grid[y][x-1].type != SOLID_TYPE && left_diff > 0.0f)
             {
-                Cell *right = &grid[y][x+1];
+                left_flow = left_diff * 0.5f;
 
-                if(right->type != SOLID_TYPE)
-                {
-                    float diff = current_quantity - right->fill_level; // le reste de l'eau courant apres regle 1 et regle 2(left) - level right
-
-                    if(diff > 0.0f)
-                    {
-                        float transfer = diff * 0.5f;
-                        float right_capacity = 1 - right->fill_level;
-
-                        if(transfer > right_capacity)
-                            transfer = right_capacity;
-                        if(transfer > current_quantity)
-                            transfer = current_quantity;
-
-                        if(transfer > 0.25f)
-                            transfer = 0.25f;
-
-                        next_grid[y][x+1].fill_level += transfer;
-                        next_grid[y][x+1].type = WATER_TYPE;
-
-                        current_quantity -= transfer;
-                    }
-                }
+                float capacity = 1.0f - next_grid[y][x-1].fill_level;
+                if(left_flow > capacity)
+                    left_flow = capacity; // on ne transfère que ce que voici peut recevoir
             }
 
-            //  ====================================
-            // 3. Mettre à jour la cellule courante
-            // =====================================
-            next_current->fill_level = current_quantity; // a priori le next_grid level est à 0, donc on ajoute l'eau qui reste
-            if(next_current->fill_level > 0.001f)
+            // -------- RIGTH -------------
+            if( x < COLUMNS - 1 && grid[y][x+1].type != SOLID_TYPE && right_diff > 0.0f) // ..., si current a plus d'eau que son voisin
             {
-                next_current->type = WATER_TYPE;
+                right_flow = right_diff * 0.5f;
+
+                float capacity = 1.0f - next_grid[y][x+1].fill_level;
+                if(right_flow > capacity)
+                    right_flow = capacity;
+            }
+
+            // ==================================
+            // NORMALISATION
+            // ==================================
+            float total_flow = down_flow + left_flow + right_flow;
+
+            // évite création/perte d'eau : répartit l'eau proportionnellement
+            if(total_flow > current->fill_level)
+            {
+                float k = current_quantity / total_flow;
+
+                down_flow *= k; // on réduit tous les flux proportionnellement
+                left_flow *= k;
+                right_flow *= k;
+            }
+
+            // ==================================
+            // Application des flux
+            // ==================================
+            if(down_flow > 0.0f)
+            {
+                next_grid[y+1][x].fill_level += down_flow;
+                next_grid[y+1][x].type = WATER_TYPE;
+            }
+
+            if(left_flow > 0.0f)
+            {
+                next_grid[y][x-1].fill_level += left_flow;
+                next_grid[y][x-1].type = WATER_TYPE;
+            }
+
+            if(right_flow > 0.0f)
+            {
+                next_grid[y][x+1].fill_level += right_flow;
+                next_grid[y][x+1].type = WATER_TYPE;
+            }
+
+            // ==================================
+            // Reste dans la cellule actuelle
+            // ==================================
+             float stay = current->fill_level - (down_flow + left_flow + right_flow);
+
+            if(stay > 0.001f)
+            {
+                next_grid[y][x].fill_level += stay;
+                next_grid[y][x].type = WATER_TYPE;
             }
             else
             {
-                next_current->type = EMPTY_TYPE;
-                next_current->fill_level = 0.0f;
+                next_grid[y][x].type = EMPTY_TYPE;
+                next_grid[y][x].fill_level = 0.0f;
             }
+
         }
     }
 
@@ -184,7 +182,6 @@ void simulation_step()
     // ====================================
     memcpy(grid, next_grid, sizeof(grid));
 }
-
 
 
 // ----------------------------------------------------------------------------------------
