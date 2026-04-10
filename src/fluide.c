@@ -50,7 +50,7 @@ void simulation_step()
         {
             Cell *current = &grid[y][x];
 
-            //  =================================
+            // =================================
             // 3. Ignorer certainnes conditions
             // ==================================
 
@@ -69,7 +69,7 @@ void simulation_step()
             float current_quantity = current->fill_level;
             Cell *next_current = &next_grid[y][x];
 
-            //  =================================
+            // =================================
             // RULE 1: flow down (gravité)
             // ==================================
             if(y + 1 < ROWS) // sécurité pour ne pas sortir de la fenêtre window
@@ -94,7 +94,7 @@ void simulation_step()
                 }
             }
 
-            //  =================================
+            // =================================
             // RULE 2: flow LEFT
             // ==================================
             if(x - 1 >= 0) // Sécurité pour ne pas faire débordé la grid
@@ -190,7 +190,7 @@ void water_cell(int x, int y)
 {
     if(x < 0 || x >= COLUMNS || y < 0 || y >= ROWS) return;
     grid[y][x].type = WATER_TYPE;
-    grid[y][x].fill_level = 1.0f;
+    grid[y][x].fill_level = 0.5f;
 }
 
 void solid_cell(int x, int y)
