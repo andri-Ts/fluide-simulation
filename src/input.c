@@ -20,20 +20,40 @@ void handle_events(SDL_bool *running, SDL_bool *delete_mode)
                 break;
 
             case SDL_MOUSEMOTION:
+            {
                 int cellX = event.motion.x / CELL_SIZE;
                 int cellY = event.motion.y / CELL_SIZE;
 
                 if(cellX < 0 || cellX >= COLUMNS || cellY < 0 || cellY >= ROWS)
-                    break;
+                break;
 
                 if(*delete_mode)
                     remove_cell(cellX, cellY);
                 else if(event.motion.state & SDL_BUTTON(SDL_BUTTON_LEFT))
-                    add_solid(cellX, cellY);
+                    solid_cell(cellX, cellY);
                 else if(event.motion.state & SDL_BUTTON(SDL_BUTTON_RIGHT))
-                    add_water(cellX, cellY);
+                    water_cell(cellX, cellY);
 
                 break;
+            }
+
+            case SDL_MOUSEBUTTONDOWN:
+                {
+                    int cellX = event.button.x / CELL_SIZE;
+                    int cellY = event.button.y / CELL_SIZE;
+
+                    if(cellX < 0 || cellX >= COLUMNS || cellY < 0 || cellY >= ROWS)
+                        break;
+
+                    if(*delete_mode)
+                        remove_cell(cellX, cellY);
+                    else if(event.button.button == SDL_BUTTON_LEFT)
+                        solid_cell(cellX, cellY);
+                    else if(event.button.button == SDL_BUTTON_RIGHT)
+                        water_cell(cellX, cellY);
+
+                    break;
+                }
 
             default:
                 break;

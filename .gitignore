@@ -9,6 +9,7 @@ programme
 # Dossiers de build (si tu en ajoutes plus tard)
 build/
 bin/
+dependencies/
 
 # Fichiers temporaires
 *.log
