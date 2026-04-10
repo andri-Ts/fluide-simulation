@@ -79,10 +79,13 @@ void simulation_step()
                 if(below->type != SOLID_TYPE)
                 {
                     float below_capacity = 1.0f - below->fill_level;
+                    float space = 1.0f - next_grid[y+1][x].fill_level;
                     float transfer = current_quantity;
 
                     if(transfer > below_capacity)
                         transfer = below_capacity; // on ne transfert que ce que below peut contenir, si non on transfert tout
+                    if(transfer > space)
+                        transfer = space; // évite le surcharge
 
                     // On modifie la cellule d'en bas
                     if(transfer > 0.0f)
@@ -190,7 +193,7 @@ void water_cell(int x, int y)
 {
     if(x < 0 || x >= COLUMNS || y < 0 || y >= ROWS) return;
     grid[y][x].type = WATER_TYPE;
-    grid[y][x].fill_level = 0.5f;
+    grid[y][x].fill_level = 1.0f;
 }
 
 void solid_cell(int x, int y)
