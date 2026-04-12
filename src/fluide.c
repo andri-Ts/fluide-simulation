@@ -64,19 +64,17 @@ void simulation_step()
             // Ignorer les cellules vides
             if(current->type != WATER_TYPE)
                 continue;
-
-
-            // float current_quantity = current->fill_level;
-            // Cell *next_current = &next_grid[y][x];
+            
             float current_quantity = current->fill_level; // Quantité d'eau dans la cellule courante
             float down_flow = 0.0f; // flux de descente
             float left_flow = 0.0f; // flux de vers la gauche
-            float right_flow = 0.0f; //
+            float right_flow = 0.0f;
             float up_flow = 0.0f;
 
             // ==================================
             // RULE 1: flow down (gravité)
             // ==================================
+            
             if(y + 1 < ROWS) // sécurité pour ne pas sortir de la fenêtre window
             {
                 Cell *below = &grid[y+1][x];
@@ -127,6 +125,7 @@ void simulation_step()
             // ==================================
             // RULE 3: Pression
             // ==================================
+            
             float excess = 0.0f;
             float max_flow = 0.25f;
 
@@ -150,11 +149,10 @@ void simulation_step()
                         // limit de vitesse -> stabilité
                         if(up_flow > max_flow)
                             up_flow = max_flow;
+                        
                         // suppression bruit numérique
                         if(up_flow < 0.001f)
                             up_flow = 0.0f;
-
-                        // current_quantity -= up_flow; // retirer l'eau de current_quantit
                     }
                 }
             }
@@ -162,6 +160,7 @@ void simulation_step()
             // ==================================
             // NORMALISATION (réduit tout proportionnement)
             // ==================================
+            
             float total_flow = down_flow + left_flow + right_flow + up_flow;
 
             // évite création/perte d'eau : répartit l'eau proportionnellement
@@ -177,9 +176,10 @@ void simulation_step()
                 up_flow *= k;
             }
 
-            // ==================================
+            // ===============================================================================
             // Application des flux (envoye des quantités réels d'eau dans les cases voisines)
-            // ==================================
+            // ================================================================================
+            
             if(down_flow > 0.0f)
             {
                 next_grid[y+1][x].fill_level += down_flow;
@@ -207,9 +207,8 @@ void simulation_step()
             // ==================================
             // Reste dans la cellule actuelle
             // ==================================
+            
             float stay = current->fill_level - total_flow; // l'eau qui n'a pas bougé
-            // float stay = current_quantity - (down_flow + left_flow + right_flow + up_flow); // l'eau qui n'a pas bougé
-            // float stay = current_quantity; // l'eau qui n'a pas bougé
 
             if(stay > 0.001f)
             {
@@ -228,9 +227,9 @@ void simulation_step()
     //  ===================================
     // FINAL: Remplacer grid par next_grid
     // ====================================
+    
     memcpy(grid, next_grid, sizeof(grid));
 }
-
 
 // ----------------------------------------------------------------------------------------
 
