@@ -19,18 +19,18 @@ void render_frame(void)
     {
         for(int x = 0; x < COLUMNS; x++)
         {
-            Cell c = get_cell(y, x);
-            if(c.type == EMPTY_TYPE) continue;
+            Cell *c = get_cell(y, x);
+            if(!c || c->type == EMPTY_TYPE) continue;
 
             SDL_Rect rect = { x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE };
 
-            if(c.type == SOLID_TYPE)
+            if(c->type == SOLID_TYPE)
                 SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-            else if(c.type == WATER_TYPE)
+            else if(c->type == WATER_TYPE)
             {
                 SDL_SetRenderDrawColor(renderer, 0, 180, 216, SDL_ALPHA_OPAQUE);
-                rect.y += CELL_SIZE - (CELL_SIZE * c.fill_level);
-                rect.h = CELL_SIZE * c.fill_level;
+                rect.y += CELL_SIZE - (CELL_SIZE * c->fill_level);
+                rect.h = CELL_SIZE * c->fill_level;
             }
 
             SDL_RenderFillRect(renderer, &rect);
@@ -53,7 +53,7 @@ void draw_grid(SDL_Renderer *renderer)
     {
         // 2 - DEFINIR LA FIGURE
         int posX = x * CELL_SIZE;
-        //// 3- DESSINER LA FIGURE (sur celle-ci, definition et dessin en même tmps)
+        // 3- DESSINER LA FIGURE (sur celle-ci, definition et dessin en même tmps)
         SDL_RenderDrawLine(renderer, posX, 0, posX, ROWS * CELL_SIZE); // (xStart, yStart, xEnd, yeND[coordoné du dernier pixel du bas])
     }
 

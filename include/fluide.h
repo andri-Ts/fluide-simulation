@@ -7,7 +7,7 @@ void init_grid(void);
 void simulation_step(void);
 
 // Acces au grid via API
-Cell get_cell(int y, int x);
+Cell* get_cell(int y, int x);
 // void set_cell(int y, int x, Cell c);
 
 //Foncitons pour manipueler les cellules
