@@ -28,22 +28,11 @@ int main(int argc, char* argv[])
         // ---- RENDER ----
         render_frame();
 
-        SDL_Delay(32);
+        // Vitesse frame
+        SDL_Delay(24);
     }
 
     cleanup();
 
     return 0;
 }
-
-/* STRUCTURE :
-----------------
-init();
-while (running)
-{
-    handle_events();
-    update();
-    render();
-}
-cleanup();
-*/

@@ -39,7 +39,7 @@ void simulation_step()
     //  =================================
     // 1. RESET COMPLET DE next_grid
     // ==================================
-    memset(next_grid, 0, sizeof(grid)); // (grid à afficher pour le prochain frame) on le veut vide
+    memset(next_grid, 0, sizeof(next_grid)); // (grid à afficher pour le prochain frame) on le veut vide
 
     //  =================================
     // 2. Parcours de la grille(lecture)
@@ -64,18 +64,17 @@ void simulation_step()
             // Ignorer les cellules vides
             if(current->type != WATER_TYPE)
                 continue;
-
-
-            // float current_quantity = current->fill_level;
-            // Cell *next_current = &next_grid[y][x];
+            
             float current_quantity = current->fill_level; // Quantité d'eau dans la cellule courante
             float down_flow = 0.0f; // flux de descente
             float left_flow = 0.0f; // flux de vers la gauche
-            float right_flow = 0.0f; //
+            float right_flow = 0.0f;
+            float up_flow = 0.0f;
 
             // ==================================
             // RULE 1: flow down (gravité)
             // ==================================
+            
             if(y + 1 < ROWS) // sécurité pour ne pas sortir de la fenêtre window
             {
                 Cell *below = &grid[y+1][x];
@@ -101,11 +100,12 @@ void simulation_step()
 
             float left_diff = current_quantity - left_quantity; // current est il plus plein que son voisin
             float right_diff = current_quantity - right_quantity;
+            float flow_factor = 0.25f; // facteur d'amortissement pour éviter les oscillations
 
             // -------- LEFT --------------
             if( x > 0 && grid[y][x-1].type != SOLID_TYPE && left_diff > 0.0f)
             {
-                left_flow = left_diff * 0.5f;
+                left_flow = left_diff * flow_factor;
 
                 float capacity = 1.0f - next_grid[y][x-1].fill_level;
                 if(left_flow > capacity)
@@ -115,7 +115,7 @@ void simulation_step()
             // -------- RIGTH -------------
             if( x < COLUMNS - 1 && grid[y][x+1].type != SOLID_TYPE && right_diff > 0.0f) // ..., si current a plus d'eau que son voisin
             {
-                right_flow = right_diff * 0.5f;
+                right_flow = right_diff * flow_factor;
 
                 float capacity = 1.0f - next_grid[y][x+1].fill_level;
                 if(right_flow > capacity)
@@ -123,23 +123,63 @@ void simulation_step()
             }
 
             // ==================================
+            // RULE 3: Pression
+            // ==================================
+            
+            float excess = 0.0f;
+            float max_flow = 0.25f;
+
+            // 1. detecter la pression : current_quantity > 1.0(volume stable) ?
+            if(current_quantity > 1.0f)
+            {
+                // 2. calcluler l'excès : current_q - 1.0
+                excess = current_quantity - 1.0f;
+
+                // 3. cellule au dessus existe? !solide? pleine ou pas? Trouver capacité restante
+                if(y - 1 >= 0)
+                {
+                    if(excess > 0.0f && grid[y-1][x].type != SOLID_TYPE)
+                    {
+                        up_flow = excess * 0.5f;
+                        float capacity = 1.0f - next_grid[y-1][x].fill_level;
+
+                        if(capacity < excess)
+                            up_flow = capacity;
+
+                        // limit de vitesse -> stabilité
+                        if(up_flow > max_flow)
+                            up_flow = max_flow;
+                        
+                        // suppression bruit numérique
+                        if(up_flow < 0.001f)
+                            up_flow = 0.0f;
+                    }
+                }
+            }
+
+            // ==================================
             // NORMALISATION (réduit tout proportionnement)
             // ==================================
-            float total_flow = down_flow + left_flow + right_flow;
+            
+            float total_flow = down_flow + left_flow + right_flow + up_flow;
 
             // évite création/perte d'eau : répartit l'eau proportionnellement
             if(total_flow > current->fill_level)
+            // if(total_flow > current_quantity)
             {
-                float k = current_quantity / total_flow;
+                // float k = current_quantity / total_flow;
+                float k = current->fill_level / total_flow;
 
                 down_flow *= k; // on réduit tous les flux proportionnellement
                 left_flow *= k;
                 right_flow *= k;
+                up_flow *= k;
             }
 
-            // ==================================
+            // ===============================================================================
             // Application des flux (envoye des quantités réels d'eau dans les cases voisines)
-            // ==================================
+            // ================================================================================
+            
             if(down_flow > 0.0f)
             {
                 next_grid[y+1][x].fill_level += down_flow;
@@ -158,10 +198,17 @@ void simulation_step()
                 next_grid[y][x+1].type = WATER_TYPE;
             }
 
+            if(up_flow > 0.0f)
+            {
+                next_grid[y-1][x].fill_level += up_flow;
+                next_grid[y-1][x].type = WATER_TYPE;
+            }
+
             // ==================================
             // Reste dans la cellule actuelle
             // ==================================
-             float stay = current->fill_level - (down_flow + left_flow + right_flow); // l'eau qui n'a pas bougé
+            
+            float stay = current->fill_level - total_flow; // l'eau qui n'a pas bougé
 
             if(stay > 0.001f)
             {
@@ -180,9 +227,9 @@ void simulation_step()
     //  ===================================
     // FINAL: Remplacer grid par next_grid
     // ====================================
+    
     memcpy(grid, next_grid, sizeof(grid));
 }
-
 
 // ----------------------------------------------------------------------------------------
 
