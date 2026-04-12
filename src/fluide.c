@@ -127,30 +127,32 @@ void simulation_step()
             // ==================================
             // RULE 3: Pression
             // ==================================
-            float exces = 0.0f;
+            float excess = 0.0f;
             float max_flow = 0.25f;
 
             // 1. detecter la pression : current_quantity > 1.0(volume stable) ?
             if(current_quantity > 1.0f)
             {
                 // 2. calcluler l'excès : current_q - 1.0
-                exces = current_quantity - 1.0f;
+                excess = current_quantity - 1.0f;
 
                 // 3. cellule au dessus existe? !solide? pleine ou pas? Trouver capacité restante
                 if(y - 1 >= 0)
                 {
-                    if(exces > 0.0f && grid[y-1][x].type != SOLID_TYPE)
+                    if(excess > 0.0f && grid[y-1][x].type != SOLID_TYPE)
                     {
+                        up_flow = excess * 0.5f;
                         float capacity = 1.0f - next_grid[y-1][x].fill_level;
 
-                        if(capacity < exces)
+                        if(capacity < excess)
                             up_flow = capacity;
-                        else
-                            up_flow = exces;
 
-                        // limiter la vitesse de monter
+                        // limit de vitesse -> stabilité
                         if(up_flow > max_flow)
                             up_flow = max_flow;
+                        // suppression bruit numérique
+                        if(up_flow < 0.001f)
+                            up_flow = 0.0f;
 
                         // current_quantity -= up_flow; // retirer l'eau de current_quantit
                     }

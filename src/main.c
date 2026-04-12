@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
         // ---- RENDER ----
         render_frame();
 
-        SDL_Delay(48);
+        SDL_Delay(24);
     }
 
     cleanup();
