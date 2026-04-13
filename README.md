@@ -57,4 +57,4 @@ build/
 
 ## 👨‍💻 Auteur
 
-Projet personnel d’apprentissage en C + SDL2.
+Projet personnel en C + SDL2.
