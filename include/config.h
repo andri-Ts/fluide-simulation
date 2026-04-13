@@ -20,7 +20,6 @@ typedef struct Cell
 {
     CellType type;
     float fill_level; // 0 à 1
-    int x, y;
 } Cell;
 
 #endif

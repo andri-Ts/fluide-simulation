@@ -6,14 +6,18 @@
 static Cell grid[ROWS][COLUMNS]; // visible uniquement dans ce fichier
 static Cell next_grid[ROWS][COLUMNS]; // Etat suivant de la grid
 
+const float FLOW_FACTOR = 0.25f; // facteur d'amortissement pour éviter les oscillations
+const float MAX_FLOW = 0.25f;
+const float EPSILON = 0.001f;
+
 // ----------------------------------------------------------------------------------------
 
-Cell get_cell(int y, int x)
+Cell* get_cell(int y, int x)
 {
     if(x < 0 || x >= COLUMNS || y < 0 || y >= ROWS)
-        return (Cell){0, 0, EMPTY_TYPE, 0.0f}; // renvoie une cellule vide neutre si on dépasse les limites (évite le crash)
+        return NULL; // renvoie une cellule vide neutre si on dépasse les limites (évite le crash)
 
-    return grid[y][x];
+    return &grid[y][x];
 }
 
 // ----------------------------------------------------------------------------------------
@@ -24,8 +28,6 @@ void init_grid(void)
     {
         for(int x = 0; x < COLUMNS; x++) // Le second indice (grid[…][x]) correspond à la colonne → l’axe horizontal (X)
         {
-            grid[y][x].x = x;
-            grid[y][x].y = y;
             grid[y][x].type = EMPTY_TYPE;
             grid[y][x].fill_level = 0.0f;
         }
@@ -64,7 +66,7 @@ void simulation_step()
             // Ignorer les cellules vides
             if(current->type != WATER_TYPE)
                 continue;
-            
+
             float current_quantity = current->fill_level; // Quantité d'eau dans la cellule courante
             float down_flow = 0.0f; // flux de descente
             float left_flow = 0.0f; // flux de vers la gauche
@@ -74,7 +76,7 @@ void simulation_step()
             // ==================================
             // RULE 1: flow down (gravité)
             // ==================================
-            
+
             if(y + 1 < ROWS) // sécurité pour ne pas sortir de la fenêtre window
             {
                 Cell *below = &grid[y+1][x];
@@ -100,12 +102,11 @@ void simulation_step()
 
             float left_diff = current_quantity - left_quantity; // current est il plus plein que son voisin
             float right_diff = current_quantity - right_quantity;
-            float flow_factor = 0.25f; // facteur d'amortissement pour éviter les oscillations
 
             // -------- LEFT --------------
             if( x > 0 && grid[y][x-1].type != SOLID_TYPE && left_diff > 0.0f)
             {
-                left_flow = left_diff * flow_factor;
+                left_flow = left_diff * FLOW_FACTOR;
 
                 float capacity = 1.0f - next_grid[y][x-1].fill_level;
                 if(left_flow > capacity)
@@ -115,7 +116,7 @@ void simulation_step()
             // -------- RIGTH -------------
             if( x < COLUMNS - 1 && grid[y][x+1].type != SOLID_TYPE && right_diff > 0.0f) // ..., si current a plus d'eau que son voisin
             {
-                right_flow = right_diff * flow_factor;
+                right_flow = right_diff * FLOW_FACTOR;
 
                 float capacity = 1.0f - next_grid[y][x+1].fill_level;
                 if(right_flow > capacity)
@@ -125,9 +126,9 @@ void simulation_step()
             // ==================================
             // RULE 3: Pression
             // ==================================
-            
+
             float excess = 0.0f;
-            float max_flow = 0.25f;
+            float MAX_FLOW = 0.25f;
 
             // 1. detecter la pression : current_quantity > 1.0(volume stable) ?
             if(current_quantity > 1.0f)
@@ -147,11 +148,11 @@ void simulation_step()
                             up_flow = capacity;
 
                         // limit de vitesse -> stabilité
-                        if(up_flow > max_flow)
-                            up_flow = max_flow;
-                        
+                        if(up_flow > MAX_FLOW)
+                            up_flow = MAX_FLOW;
+
                         // suppression bruit numérique
-                        if(up_flow < 0.001f)
+                        if(up_flow < EPSILON)
                             up_flow = 0.0f;
                     }
                 }
@@ -160,7 +161,7 @@ void simulation_step()
             // ==================================
             // NORMALISATION (réduit tout proportionnement)
             // ==================================
-            
+
             float total_flow = down_flow + left_flow + right_flow + up_flow;
 
             // évite création/perte d'eau : répartit l'eau proportionnellement
@@ -179,7 +180,7 @@ void simulation_step()
             // ===============================================================================
             // Application des flux (envoye des quantités réels d'eau dans les cases voisines)
             // ================================================================================
-            
+
             if(down_flow > 0.0f)
             {
                 next_grid[y+1][x].fill_level += down_flow;
@@ -207,10 +208,10 @@ void simulation_step()
             // ==================================
             // Reste dans la cellule actuelle
             // ==================================
-            
+
             float stay = current->fill_level - total_flow; // l'eau qui n'a pas bougé
 
-            if(stay > 0.001f)
+            if(stay > EPSILON)
             {
                 next_grid[y][x].fill_level += stay;
                 next_grid[y][x].type = WATER_TYPE;
@@ -227,7 +228,7 @@ void simulation_step()
     //  ===================================
     // FINAL: Remplacer grid par next_grid
     // ====================================
-    
+
     memcpy(grid, next_grid, sizeof(grid));
 }
 
